@@ -1,0 +1,74 @@
+DataStore Changelog (dates in dd/mm/yyyy)
+===================
+
+
+Version 2023.11.17 (17/11/2023)
+
+- ToC Update for Vanilla
+
+Version 2023.11.06 (06/11/2023)
+
+- ToC Update for 10.2
+- Updated Ace Libraries
+
+Version 2023.05.04 (04/05/2023)
+
+- Updated Ace Libraries
+
+Version 2023.05.03 (03/05/2023)
+
+- ToC Update for 10.1
+
+Version 2023.02.23 (23/02/2023)
+
+- ToC Update for 10.0.05
+
+Version 2022.12.18 (16/11/2022)
+
+- Added support for DataStore_Currencies in WotLK.
+
+Version 2022.11.16 (16/11/2022)
+
+- Fixed Enums to use Enum.ItemClass (Thanks Feral !)
+- ToC Update for 10.0.02
+
+Version 2022.10.31 (31/10/2022)
+
+- Added Dragonflight expansion to Enum.lua (Thanks Feral !)
+
+Version 2022.10.30 (30/10/2022)
+
+- ToC Update for 10.0
+
+Version 2022.10.25 (25/10/2022)
+
+- ToC Update for all versions
+
+Version 2022.08.05 (05/08/2022)
+
+- Removed a check that caused a clean of the current alt's data.
+
+Version 2022.08.03 (03/08/2022)
+
+- Renamed the :IterateModules() function to IterateDBModules, as it conflicted with that of AceAddon.
+- Changed the table pointer to use the proper database level. (moduleDB.db.global instead of moduleDB)
+- Added a sanity check in RegisterModule to clean orphan data in sub-modules.
+
+Version 2022.06.05 (05/06/2022)
+
+- ToC Update for all versions
+
+Version 2022.03.14 (14/03/2022)
+
+- ToC Update for all versions
+
+Version 2021.10.05 (05/10/2021)
+
+- Moved bit manipulation functions to the utility API.
+- Removed deprecated database update code.
+
+Version 2021.10.03 (03/10/2021)
+
+- As of this version, DataStore will be released in a single package compatible with all versions of the game.
+- As of this version, the version number will no longer be 1.x or 9.x, but rather a date that clearly identifies when the release took place.
+- Currently only the main DataStore module works with all versions, but all other modules will be reworked in a similar fashion.

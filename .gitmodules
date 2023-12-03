@@ -28,3 +28,6 @@
 [submodule "DataStore/libs/LibStub"]
 	path = DataStore/libs/LibStub
 	url = https://github.com/WoWUIDev/Ace3.git
+[submodule "DataStore/libs/LibAboutPanel"]
+	path = DataStore/libs/LibAboutPanel
+	url = https://github.com/Ackis/LibAboutPanel.git

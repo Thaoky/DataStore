@@ -1,6 +1,6 @@
 # DataStore
 
-DataStore is the main component of a series of addons that serve as data repositories in game. Their respective purpose is to offer scanning and storing services to other addons.
+DataStore is the main component of a series of addons that serve as data repositories in World of Warcraft. Their respective purpose is to offer scanning and storing services to other addons.
 
 The advantages of this approach are:
 

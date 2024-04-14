@@ -2,7 +2,7 @@ if not DataStore then return end
 
 local addonName = ...
 local addon = _G[addonName]
-local L = LibStub("AceLocale-3.0"):GetLocale(addonName)
+local L = DataStore:GetLocale(addonName)
 
 local addonList = {
 	"DataStore",
@@ -129,9 +129,11 @@ end
 
 function addon:AddOptionCategory(frame, name, parent)
 	-- tiny wrapper to add categories in Blizzard's options panel
-	frame.name = name
-	frame.parent = parent
-	InterfaceOptions_AddCategory(frame)
+	
+	-- commented on 31/03/2024, most likely only required by non-retail only, check later
+	-- frame.name = name
+	-- frame.parent = parent
+	-- InterfaceOptions_AddCategory(frame)
 end
 
 function addon:SetupOptions()
@@ -150,20 +152,19 @@ function addon:SetupOptions()
 	-- DataStoreHelp_Text:SetWidth(width-35)
 end
 
-function addon:ToggleOption(frame, module, option)
+function addon:ToggleOption(frame, optionsTable, option)
 	local newValue
 	
 	if frame then							-- if a frame is provided ..
-		if frame:GetChecked() then 	-- .. then get its value (it is set before coming here)
-			newValue = true
-		else
-			newValue = false
-		end
+		-- .. then get its value (it is set before coming here)
+		newValue = frame:GetChecked() and true or false
 	else
-		newValue = not addon:GetOption(module, option)		-- no frame provided ? then actually toggle the current value
+		-- no frame provided ? then actually toggle the current value
+		-- ex: newValue = not DataStore_Auctions.CheckLastVisit
+		newValue = not _G[optionsTable][option]
 	end
 	
-	addon:SetOption(module, option, newValue)
+	_G[optionsTable][option] = newValue
 end
 
 function addon:UpdateMyMemoryUsage()

@@ -2,6 +2,15 @@ DataStore Changelog (dates in dd/mm/yyyy)
 ===================
 
 
+Version 2023.12.30 (30/12/2023)
+
+- Added a few utility functions for array management.
+- Prepared the new SV tables for future data migration, using internal character id (final goal : lower memory footprint).
+- Each alt and guild will now get a unique numeric id shared between modules (currently mostly unused, only attributed).
+- Alt groups have been reworked and must be recreated. This feature now required the new internal ids, so alts must be logged in again once in order to be added to a group.
+- Support for connected realms is now done via a new SV table, be sure to log in alts that are part of a guild from another realm.
+
+
 Version 2023.11.17 (17/11/2023)
 
 - ToC Update for Vanilla

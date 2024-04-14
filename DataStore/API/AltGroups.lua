@@ -1,12 +1,12 @@
 local addonName, addon = ...
 
-local function GetAltGroups()
-	return addon.db.global.AltGroups
-end
+local TableInsert, TableConcat, format, pairs = table.insert, table.concat, format, pairs
+local altGroups
 
-function addon:CreateAltGroup(group)
-	local altGroups = GetAltGroups()
+addon.AltGroups = {}
+local namespace = addon.AltGroups
 
+function namespace:Create(group)
 	if not altGroups[group] then
 		altGroups[group] = {}
 		
@@ -15,9 +15,7 @@ function addon:CreateAltGroup(group)
 	end
 end
 
-function addon:DeleteAltGroup(group)
-	local altGroups = GetAltGroups()
-
+function namespace:Delete(group)
 	if altGroups[group] then
 		altGroups[group] = nil
 		
@@ -26,9 +24,7 @@ function addon:DeleteAltGroup(group)
 	end
 end
 
-function addon:RenameAltGroup(oldGroup, newGroup)
-	local altGroups = GetAltGroups()
-	
+function namespace:Rename(oldGroup, newGroup)
 	if altGroups[oldGroup] then
 		-- make the new group point to the same table as the old
 		altGroups[newGroup] = altGroups[oldGroup]
@@ -41,14 +37,11 @@ function addon:RenameAltGroup(oldGroup, newGroup)
 	end	
 end
 
-function addon:IsAltGroupExisting(group)
-	local altGroups = GetAltGroups()
-	
+function namespace:Exists(group)
 	return (altGroups[group] ~= nil)
 end
 
-function addon:IterateAltGroups(callback)
-	local altGroups = GetAltGroups()
+function namespace:Iterate(callback)
 	local sortedGroups = addon:HashToSortedArray(altGroups)
 
 	for _, groupName in pairs(sortedGroups) do
@@ -56,36 +49,51 @@ function addon:IterateAltGroups(callback)
 	end
 end
 
-function addon:AddToAltGroup(group, character)
-	local altGroups = GetAltGroups()
+function namespace:AddCharacter(group, character)
+	-- Get the internal characterID
+	local characterID = addon:GetCharacterID(character)
+	if not characterID then
+		addon:Print(format("Internal ID not found for %s, login with this character first", character))
+		return
+	end
 	
+	-- Add the id to this group
 	altGroups[group] = altGroups[group] or {}
-	altGroups[group][character] = true
+	addon:ArrayInsertUnique(altGroups[group], characterID)
 end
 
-function addon:RemoveFromAltGroup(group, character)
-	local altGroups = GetAltGroups()
+function namespace:RemoveCharacter(group, character)
+	-- Get the internal characterID
+	local characterID = addon:GetCharacterID(character)
 	
-	if altGroups[group] then
-		altGroups[group][character] = nil
+	if characterID and altGroups[group] then
+		addon:ArrayRemoveValue(altGroups[group], characterID)
 	end
 end
 
-function addon:IsInAltGroup(group, character)
-	local altGroups = GetAltGroups()
+function namespace:Contains(group, character)
+	local characterID = addon:GetCharacterID(character)
 	
-	return (altGroups[group] and altGroups[group][character])
+	if characterID and altGroups[group] then
+		return addon:ArrayContainsValue(altGroups[group], characterID)
+	end
 end
 
-function addon:GetAltGroups(character)
-	local altGroups = GetAltGroups()
+function namespace:Get(character)
+	-- Get the internal characterID
+	local characterID = addon:GetCharacterID(character) or 0
 	local groups = {}
 	
 	for groupName, groupMembers in pairs(altGroups) do
-		if groupMembers[character] then
-			table.insert(groups, groupName)
+		if addon:ArrayContainsValue(altGroups[groupName], characterID) then
+			TableInsert(groups, groupName)
 		end
 	end
 	
-	return table.concat(groups, ", "), groups
+	-- return the list of groups as a concatenated string, but also as a table
+	return TableConcat(groups, ", "), groups
 end
+
+DataStore:OnPlayerLogin(function()
+	altGroups = DataStore_AltGroups
+end)

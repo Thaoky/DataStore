@@ -1,9 +1,5 @@
-local debug = false
---[===[@debug@
-debug = true
---@end-debug@]===]
-
-local L = LibStub("AceLocale-3.0"):NewLocale("DataStore", "enUS", true, debug)
+local addonName = ...
+local L = DataStore:SetDefaultLocale(addonName, "enUS")
 
 L["Disabled"] = true
 L["Enabled"] = true

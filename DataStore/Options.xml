@@ -6,7 +6,7 @@
 		<Scripts>
 			<OnLoad>
 				local module = self:GetParent().module
-				local L = LibStub("AceLocale-3.0"):GetLocale(module)
+				local L = DataStore:GetLocale(module)
 				
 				-- Set Label
 				self.Text:SetText(L[self.locLabel])
@@ -17,7 +17,7 @@
 			<OnClick>
 				local module = self:GetParent().module
 				
-				DataStore:ToggleOption(self, module, self.option)
+				DataStore:ToggleOption(self, format("%s_Options", module), self.option)
 			</OnClick>
 		</Scripts>
 	</CheckButton>

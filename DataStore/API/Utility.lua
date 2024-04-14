@@ -1,5 +1,7 @@
 local addonName, addon = ...
 
+local TableInsert, TableRemove, TableSort, pairs, ipairs = table.insert, table.remove, table.sort, pairs, ipairs
+
 -- *** Table management ***
 function addon:GetHashSize(hash)
 	local count = 0
@@ -15,9 +17,9 @@ function addon:HashToSortedArray(hash)
 	local array = {}
 	
 	for k, _ in pairs(hash) do
-		table.insert(array, k)			-- simply insert every entry into an array ..
+		TableInsert(array, k)			-- simply insert every entry into an array ..
 	end
-	table.sort(array)						-- .. then sort it
+	TableSort(array)						-- .. then sort it
 	
 	return array
 end
@@ -26,9 +28,9 @@ function addon:HashValueToSortedArray(hash)
 	local array = {}
 	
 	for _, v in pairs(hash) do
-		table.insert(array, v)			-- simply insert every entry into an array ..
+		TableInsert(array, v)			-- simply insert every entry into an array ..
 	end
-	table.sort(array)						-- .. then sort it
+	TableSort(array)						-- .. then sort it
 	
 	return array
 end
@@ -38,9 +40,9 @@ function addon:SortedArrayClone(array)
 	local clone = {}
 	
 	for _, v in pairs(array) do
-		table.insert(clone, v)
+		TableInsert(clone, v)
 	end
-	table.sort(clone)
+	TableSort(clone)
 	
 	return clone
 end
@@ -57,23 +59,82 @@ function addon:CopyTable(source, destination)
 	end
 end
 
+function addon:ArrayInsertUnique(array, value)
+	-- Check if the element already exists in the array
+	for _, v in ipairs(array) do
+		-- Element already exists, do nothing
+		if v == value then return end
+	end
 
--- *** Bit manipulation ***
-local bAnd = bit.band
-
-function addon.LeftShift(value, numBits)
-	return value * (2 ^ numBits)
+	-- Element doesn't exist, add it to the end of the array
+	TableInsert(array, value)
 end
 
-function addon.RightShift(value, numBits)
-	-- for bits beyond bit 31
-	return math.floor(value / 2 ^ numBits)
+function addon:ArrayRemoveValue(array, value)
+	for i = #array, 1, -1 do
+		if array[i] == value then
+			TableRemove(array, i)
+			return
+		end
+	end
 end
 
-function addon.TestBit(value, pos)
-   local mask = 2 ^ pos
-   
-	if bAnd(value, mask) == mask then
-      return true
-   end
+function addon:ArrayContainsValue(array, value)
+	for i = 1, #array do
+		if array[i] == value then
+			return true
+		end
+	end
+end
+
+function addon:AddOrGetAutoID(hash, value)
+	-- is the value already known ?
+	if not hash[value] then
+		hash.LastID = hash.LastID or 0	-- Initialize the autoID if necessary
+		hash.LastID = hash.LastID + 1		-- Increment it
+		
+		hash[value] = hash.LastID			-- Assign the new autoID
+	end
+	
+	return hash[value]
+end
+
+
+-- ** Set & List **
+function addon:CreateSetAndList(container)
+	container.Set = container.Set or {}
+	container.List = container.List or {}
+	container.Count = container.Count or 0
+	
+	return container
+end
+
+function addon:StoreToSetAndList(container, value)
+	local set = container.Set
+
+	-- if this value is not yet referenced ..
+	if not set[value] then
+		local list = container.List
+		
+		TableInsert(list, value)		-- ex: [1] = "Shadowlands"
+		set[value] = #list				-- ["Shadowlands"] = 1
+		
+		-- keep track of the item count separately, the table size will not do when we remove entries
+		container.Count = container.Count + 1
+	end
+	
+	return set[value]			-- return this list's index
+end
+
+function addon:RemoveFromSetAndList(container, value)
+	local set = container.Set
+
+	-- find the index from the Set
+	local index = set[value]
+	if index then
+		TableRemove(container.List, index)	-- Delete the entry from the list
+		set[value] = nil							-- .. and also from the set
+		
+		container.Count = container.Count - 1
+	end
 end

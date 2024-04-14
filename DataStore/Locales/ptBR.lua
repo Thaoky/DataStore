@@ -1,5 +1,5 @@
-local L = LibStub("AceLocale-3.0"):NewLocale( "DataStore", "ptBR" )
-
+local addonName = ...
+local L = DataStore:SetLocale(addonName, "ptBR")
 if not L then return end
 
 L["Disabled"] = "Desativado"

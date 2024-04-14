@@ -1,37 +1,39 @@
 local addonName, addon = ...
 
+local TableInsert, pairs = table.insert, pairs
+local realmNames
+
 -- *** Connected Realms ***
-local function GetRealmNames()
-	return addon.db.global.ShortToLongRealmNames
-end
 
 function addon:SetLongRealmName(realm, name)
-	local names = GetRealmNames()
-	
-	names[realm] = name
+	-- relationship between "short" and "long" realm names, 
+	-- ex: ["MarécagedeZangar"] = "Marécage de Zangar"
+	-- necessary for guild banks on other realms..
+	DataStore_RealmNames[realm] = name
 end
 
 function addon:GetLongRealmName(realm)
-	local names = GetRealmNames()
-	
 	-- 2021-01-21 : the 'or realm' is mandatory to properly return the info of connected realms
-	return (realm) and names[realm] or realm
+	return realm and realmNames[realm] or realm
 end
 
 function addon:GetRealmsConnectedWith(realm)
-	local names = GetRealmNames()
 	local out = {}
 
 	local autoCompleteRealms = GetAutoCompleteRealms()		-- this could return nil..
 	if autoCompleteRealms then
 		for _, shortName in pairs(autoCompleteRealms) do
-			local longName = names[shortName]
+			local longName = realmNames[shortName]
 			
 			if longName and longName ~= addon.ThisRealm then
-				table.insert(out, longName)
+				TableInsert(out, longName)
 			end
 		end
 	end
 	
 	return out
 end
+
+DataStore:OnPlayerLogin(function()
+	realmNames = DataStore_RealmNames
+end)

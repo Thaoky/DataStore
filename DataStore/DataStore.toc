@@ -1,13 +1,11 @@
-## Interface: 100205
+## Interface: 100206
 ## Title: DataStore by |cFF69CCF0Thaoky|r
 ## IconTexture: Interface\Icons\garrison_building_storehouse
 
 ## Notes: Main DataStore Module
 ## Author: Thaoky (EU-Marécages de Zangar)
-## Version: 2024.01.31
-## OptionalDeps: Ace3, LibAboutPanel 
-## SavedVariables: DataStoreDB
-## X-Embeds: Ace3
+## Version: 2024.04.14
+## SavedVariables: DataStore_GuildIDs, DataStore_GuildFactions, DataStore_CharacterIDs, DataStore_CharacterGUIDs, DataStore_CharacterGuilds, DataStore_AltGroups, DataStore_ConnectedRealms, DataStore_RealmNames
 ## X-Category: Interface Enhancements
 ## X-Localizations: enUS, frFR, zhCN, zhTW, deDE, koKR, esES, esMX, ruRU
 ## X-Website: https://www.curseforge.com/wow/addons/datastore
@@ -15,11 +13,18 @@
 ## X-Donate: https://www.curseforge.com/wow/addons/altoholic
 ## X-Credits: My guild (Odysseüs), all translators, the wowace community, and all users for their invaluable suggestions !
 
-embeds.xml
-locale.xml
+Embeds_Retail.xml
 
+Events\Loading.lua
+Events\Addon.lua
+Events\Comm.lua
 API\Core.lua
+API\Locale.lua
 DataStore.lua
+
+Locale.xml
+
+API\GuildComm.lua
 API\AltGroups.lua
 API\ConnectedRealms.lua
 API\Utility.lua

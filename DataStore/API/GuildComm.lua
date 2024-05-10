@@ -38,7 +38,7 @@ local function GetAlts()
 	local guildID = addon:StoreToSetAndList(DataStore_GuildIDs, guildKey)
 	
 	local out = {}
-	for k, charID in pairs(DataStore_CharacterIDs) do
+	for k, charID in pairs(DataStore_CharacterIDs.Set) do
 		local account, realm, char = strsplit(".", k)
 
 		if account and account == addon.ThisAccount		-- same account
@@ -183,7 +183,6 @@ local commCallbacks = {
 local function GuildCommHandler(prefix, message, distribution, sender)
 	-- This handler will be used by other modules as well
 	local success, msgType, arg1, arg2, arg3 = LibSerialize:Deserialize(message)
-
 	if success and msgType and commCallbacks[prefix] then
 		local func = commCallbacks[prefix][msgType]
 

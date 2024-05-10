@@ -23,8 +23,8 @@ local modulesList = {
 	["DataStore_Talents"] = true
 }
 
-if WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC then
-	-- Add wrath modules
+if WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC then
+	-- Add cataclysm modules
 	modulesList["DataStore_Currencies"] = true
 
 elseif WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
@@ -99,12 +99,17 @@ setmetatable(addon, { __index = function(self, key)
 			local id = DataStore_GuildIDs.Set[arg1]
 			
 			arg1 = method.linkedTable[id]
+			
 			if not arg1 then return end
 		end
 		
 		return method.func(arg1, ...)
 	end
 end})
+
+local function Print(moduleName, text)
+	DEFAULT_CHAT_FRAME:AddMessage(format("|cff33ff99%s|r: %s", moduleName, text))
+end
 
 -- Initialize a table in the saved variables file
 local function InitSVTable(tableName)
@@ -188,8 +193,10 @@ function addon:RegisterModule(options)
 	
 	-- Simplify the life of child modules, and prepares a few pointers for them
 	local key = GetKey()
+	newModule.name = moduleName
 	newModule.ThisCharID = DataStore_CharacterIDs.Set and DataStore_CharacterIDs.Set[key]
-	newModule.ListenTo = function(self, ...) addon:ListenToEvent(self, ...)	end
+	newModule.Print = function(self, ...) Print(self.name, ...) end
+	newModule.ListenTo = function(self, ...) addon:ListenToEvent(self, ...) end
 	newModule.StopListeningTo = function(self, ...)	addon:StopListeningToEvent(self, ...) end
 end
 
@@ -217,6 +224,20 @@ function addon:GetCharacterDB(dbName, initTable)
 	end
 	
 	return db[id], id
+end
+
+function addon:SetDefaults(tableName, defaultValues)
+	-- Get the table
+	local t = _G[tableName]
+	if not t then return end
+	
+	for k, v in pairs(defaultValues) do
+		if type(t[k]) == "nil" then			-- If the key does not exist yet..
+			t[k] = v									-- .. set it
+		end
+	end
+	
+	return t
 end
 
 

@@ -17,6 +17,7 @@ frame:RegisterEvent("CHAT_MSG_ADDON")
 local HEADER_FIRST_MSG = "\001"
 local HEADER_NEXT_MSG = "\002"
 local HEADER_LAST_MSG = "\003"
+local HEADER_ESCAPE_CTRL = "\004"
 
 local callbacks = {}
 local incomingChunks = {}
@@ -35,40 +36,40 @@ frame:SetScript("OnEvent", function(self, event, prefix, message, distribution, 
 	
 	sender = Ambiguate(sender, "none")
 	
-	local control, chunk = match(message, "^([\001-\003])(.*)")
+	local control, chunk = match(message, "^([\001-\009])(.*)")
 	
-	-- No control character ? send the full message
-	if not control then
+	if control then
+		local uniqueID = format("%s|%s|%s", prefix, distribution, sender)
+		
+		if control == HEADER_FIRST_MSG then
+			incomingChunks[uniqueID] = {}
+			TableInsert(incomingChunks[uniqueID], chunk)
+		
+		elseif control == HEADER_NEXT_MSG then
+			-- if this is false, we lost the first message..
+			if incomingChunks[uniqueID] then
+				TableInsert(incomingChunks[uniqueID], chunk)
+			end
+		
+		elseif control == HEADER_LAST_MSG then
+			-- if this is false, we lost the first message..
+			if incomingChunks[uniqueID] then
+				TableInsert(incomingChunks[uniqueID], chunk)
+				
+				ExecuteCallbacks(prefix, TableConcat(incomingChunks[uniqueID], ""), distribution, sender)
+				incomingChunks[uniqueID] = nil
+			end
+		elseif control == HEADER_ESCAPE_CTRL then
+			ExecuteCallbacks(prefix, chunk, distribution, sender)
+		end
+	else
 		ExecuteCallbacks(prefix, message, distribution, sender)
-		return
-	end
-
-	local uniqueID = format("%s|%s|%s", prefix, distribution, sender)
-	
-	if control == HEADER_FIRST_MSG then
-		incomingChunks[uniqueID] = {}
-		TableInsert(incomingChunks[uniqueID], chunk)
-	
-	elseif control == HEADER_NEXT_MSG then
-		-- if this is false, we lost the first message..
-		if incomingChunks[uniqueID] then
-			TableInsert(incomingChunks[uniqueID], chunk)
-		end
-	
-	elseif control == HEADER_LAST_MSG then
-		-- if this is false, we lost the first message..
-		if incomingChunks[uniqueID] then
-			TableInsert(incomingChunks[uniqueID], chunk)
-			
-			ExecuteCallbacks(prefix, TableConcat(incomingChunks[uniqueID], ""), distribution, sender)
-			incomingChunks[uniqueID] = nil
-		end
 	end
 end)
 
 function addon:OnGuildComm(prefix, callback)
 	if #prefix > 16 then
-		print(format("DataStore:SetGuildComm() Prefix %s is longer than 16 characters.", prefix))
+		print(format("DataStore:OnGuildComm() Prefix %s is longer than 16 characters.", prefix))
 	end
 	
 	callbacks[prefix] = callbacks[prefix] or {}
@@ -80,6 +81,11 @@ end
 
 function addon:SendChatMessage(prefix, message, distribution, target)
 	-- Overall same code as AceComm in here, their code was already pretty optimized.
+	
+	-- Is there already a control character at the beginning ?
+	if match(message, "^[\001-\009]") then
+		message = HEADER_ESCAPE_CTRL .. message
+	end
 	
 	-- Smaller message ? send directly
 	if #message <= 255 then

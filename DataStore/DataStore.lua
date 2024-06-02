@@ -313,24 +313,40 @@ function addon:DeleteCharacter(name, realm, account)
 	local key = GetKey(name, realm, account)
 	if not allCharacters.Set[key] or key == addon.ThisCharKey then return end	-- never delete current character
 
+	-- Get the index of the character we are about to delete
+	local index = allCharacters.Set[key]
+
 	-- delete the character in all modules
-	addon:IterateDBModules(function(moduleDB, moduleName) 
-		if moduleDB.Characters then
-			moduleDB.Characters[key] = nil
+	addon:IterateModules(function(moduleTable, moduleName) 
+		
+		-- iterate all modules except the main DataStore module
+		if moduleName ~= "DataStore" then
+			if moduleTable.CharacterTables then
+				-- iterate character tables
+				for name, _ in pairs(moduleTable.CharacterTables) do
+					_G[name][index] = nil
+				end
+			end
+			
+			if moduleTable.CharacterIdTables then
+				-- iterate character id tables
+				for name, _ in pairs(moduleTable.CharacterIdTables) do
+					_G[name][index] = nil
+				end
+			end
 		end
 	end)
 
-	-- delete the key in DataStore
-	addon:RemoveFromSetAndList(allCharacters, key)
+	-- delete the key in DataStore : only delete from the Set, keep it in the list, to preserve indexes.
+	allCharacters.Set[key] = nil
 	
-	-- also delete in all tables !
 end
 
 function addon:DeleteGuild(guildKey)
 	if not allGuilds.Set[guildKey] then return end
 
 	-- delete the guild in all modules
-	addon:IterateDBModules(function(moduleDB) 
+	addon:IterateModules(function(moduleDB) 
 		if moduleDB.Guilds then
 			moduleDB.Guilds[guildKey] = nil
 		end
@@ -372,7 +388,7 @@ end
 function addon:ClearAllData()
 
 	-- sub-module data
-	addon:IterateDBModules(function(moduleDB) 
+	addon:IterateModules(function(moduleDB) 
 		WipeCharacterTable(moduleDB.Characters)
 		WipeGuildTable(moduleDB.Guilds)
 	end)

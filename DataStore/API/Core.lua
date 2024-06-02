@@ -136,6 +136,19 @@ local function SetTableMethods(newModule, tables, methodType)
 	end
 end
 
+local function SetTablesInfo(newModule, tables, storage)
+	if not tables then return end
+	
+	-- ex: make room for a "Character" sub-table
+	newModule[storage] = newModule[storage] or {}
+	
+	-- we only care about the table names
+	for name, _ in pairs(tables) do
+		newModule[storage][name] = true
+	end
+end
+
+
 local unboundCount = 0
 
 function addon:RegisterMethod(moduleObject, methodName, method)
@@ -207,6 +220,9 @@ function addon:RegisterTables(options)
 			InitSVTable(tableName)
 		end
 	end
+	
+	SetTablesInfo(options.addon, options.characterTables, "CharacterTables")
+	SetTablesInfo(options.addon, options.characterIdTables, "CharacterIdTables")
 	
 	-- Register the character & guild based methods
 	SetTableMethods(options.addon, options.characterTables, "isCharacterBased")
@@ -298,10 +314,9 @@ function addon:IsModuleEnabled(name)
 	end
 end
 
--- Warning: AceAddon already has a :IterateModules..
-function addon:IterateDBModules(callback)
-	for moduleName, moduleDB in pairs(registeredModules) do
-		callback(moduleDB.db.global, moduleName)
+function addon:IterateModules(callback)
+	for moduleName, moduleTable in pairs(registeredModules) do
+		callback(moduleTable, moduleName)
 	end
 end
 

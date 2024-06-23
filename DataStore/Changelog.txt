@@ -2,6 +2,10 @@ DataStore Changelog (dates in dd/mm/yyyy)
 ===================
 
 
+Version 2024.06.23 (23/06/2024)
+
+- ToC Update for Cataclysm Release 4.4.001
+
 Version 2024.06.02 (02/06/2024)
 
 - Properly implemented the deletion of a character in the new datase format.

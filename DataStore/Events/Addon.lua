@@ -8,11 +8,12 @@ local TableInsert, TableRemove, ipairs = table.insert, table.remove, ipairs
 
 local frame = CreateFrame("Frame")
 local events = {}
+local clearList = {}
 
 frame:SetScript("OnEvent", function(self, eventName, arg1, ...) 
 	-- if the event is one we are listening to
 	if events[eventName] then
-		for _, event in ipairs(events[eventName]) do
+		for _, event in pairs(events[eventName]) do
 			event.callback(eventName, arg1, ...)
 		end
 	end
@@ -25,7 +26,7 @@ the same event twice in separate files.
 Listening would not be a problem, but if the user wants to stop listening to one of them, it is necessary
 to be able to identify the right one otherwise scope 2 would unregister the event of scope 1.
 --]]
-	
+
 	-- if no one is listening to this event yet..
 	if not events[eventName] then
 		-- .. make room for it
@@ -48,19 +49,29 @@ function addon:StopListeningToEvent(scope, eventName, tag)
 	local event = events[eventName]
 	tag = tag or ""
 	
+	wipe(clearList)
+	
 	-- check all callbacks for this event, last to first
-	for i = #event, 1, -1 do
-		local currentTag = event[i].tag or ""
+	for index, info in pairs(event) do
+		local currentTag = info.tag or ""
 		
-		-- remove if scope matches
-		if event[i].scope == scope and currentTag == tag then
-			TableRemove(event, i)
-			
-			-- .. and unregister it
-			if C_EventUtils.IsEventValid(eventName) then
-				frame:UnregisterEvent(eventName)
-			end
+		-- mark for removal if scope matches
+		if info.scope == scope and currentTag == tag then
+			clearList[index] = true
 		end
+	end
+
+	-- Remove marked indexes
+	for k, _ in pairs(clearList) do
+		event[k] = nil
+	end
+	
+	wipe(clearList)
+	
+	-- If no one is listening to this event anymore, do some cleanup
+	if #event == 0 and C_EventUtils.IsEventValid(eventName) then
+		frame:UnregisterEvent(eventName)
+		events[eventName] = nil
 	end
 end
 

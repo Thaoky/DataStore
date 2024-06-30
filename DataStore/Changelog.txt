@@ -2,6 +2,10 @@ DataStore Changelog (dates in dd/mm/yyyy)
 ===================
 
 
+Version 2024.06.30 (30/06/2024)
+
+- Fixed the guild-character relationship sometimes getting broken. Relog an alt if it has "lost" its guild.
+
 Version 2024.06.26 (26/06/2024)
 
 - Fixed a nasty bug when unregistering an event.

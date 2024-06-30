@@ -89,47 +89,50 @@ local function OnGuildRosterUpdate()
 end
 
 local function OnPlayerGuildUpdate()
-	local guildID
-
 	-- at login this event is called between OnEnable and PLAYER_ALIVE, where GetGuildInfo returns a wrong value
 	-- however, the value returned here is correct
-	if IsInGuild() and not currentGuildName then		-- the event may be triggered multiple times, and GetGuildInfo may return incoherent values in subsequent calls, so only save if we have no value.
-		local realmName, _
-		currentGuildName, _, _, realmName = GetGuildInfo("player")		-- realmName will be nil if guild is on the same realm as the character
-		
-		if currentGuildName then
-			local guildKey
-			
-			if not realmName then
-				-- if realm is nil (= current realm), the guild key will be a classic key
-				guildKey = GetKey(currentGuildName)
-				
-			else
-				-- if realm is not nil, the guild key will use the long realm name
-				local longName = addon:GetLongRealmName(realmName)	
+	
+	-- If a guild name is already known, or if the character is not in a guild, leave.
+	if currentGuildName or not IsInGuild() then return end
+	
+	local realmName, _
+	currentGuildName, _, _, realmName = GetGuildInfo("player")		-- realmName will be nil if guild is on the same realm as the character
 
-				if longName then
-					guildKey = GetKey(currentGuildName, longName)
-					
-					-- Now check for a connected realm !
-					if longName ~= addon.ThisRealm then
-						DataStore_ConnectedRealms[longName] = addon.ThisRealm
-						DataStore_ConnectedRealms[addon.ThisRealm] = longName
-					end
-				end
-			end
+	-- the event may be triggered multiple times, and GetGuildInfo may return incoherent values in subsequent calls, leave if we have no usable value
+	if not currentGuildName then return end
+		
+	local guildKey
+	
+	if not realmName then
+		-- if realm is nil (= current realm), the guild key will be a classic key
+		guildKey = GetKey(currentGuildName)
+		
+	else
+		-- if realm is not nil, the guild key will use the long realm name
+		local longName = addon:GetLongRealmName(realmName)	
+
+		if longName then
+			guildKey = GetKey(currentGuildName, longName)
 			
-			-- guild key may be nil if the character is on a different realm than his guild, and he never logged on to that server
-			-- .. so the long realm name is unknown ..
-			if guildKey then
-				guildID = addon:StoreToSetAndList(DataStore_GuildIDs, guildKey)
-				DataStore_GuildFactions[guildID] = addon.ThisFaction
-				
-				-- the first time a valid value is found, broadcast to guild, it must happen here for a standard login, but won't work here after a reloadui since this event is not triggered
-				addon:GuildBroadcast(commPrefix, MSG_ANNOUNCELOGIN, GetAlts())
-				addon:Broadcast("DATASTORE_ANNOUNCELOGIN", currentGuildName)
+			-- Now check for a connected realm !
+			if longName ~= addon.ThisRealm then
+				DataStore_ConnectedRealms[longName] = addon.ThisRealm
+				DataStore_ConnectedRealms[addon.ThisRealm] = longName
 			end
 		end
+	end
+	
+	local guildID
+	
+	-- guild key may be nil if the character is on a different realm than his guild, and he never logged on to that server
+	-- .. so the long realm name is unknown ..
+	if guildKey then
+		guildID = addon:StoreToSetAndList(DataStore_GuildIDs, guildKey)
+		DataStore_GuildFactions[guildID] = addon.ThisFaction
+		
+		-- the first time a valid value is found, broadcast to guild, it must happen here for a standard login, but won't work here after a reloadui since this event is not triggered
+		addon:GuildBroadcast(commPrefix, MSG_ANNOUNCELOGIN, GetAlts())
+		addon:Broadcast("DATASTORE_ANNOUNCELOGIN", currentGuildName)
 	end
 	
 	local id = addon:StoreToSetAndList(DataStore_CharacterIDs, addon.ThisCharKey)

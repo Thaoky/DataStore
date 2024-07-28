@@ -2,6 +2,11 @@ DataStore Changelog (dates in dd/mm/yyyy)
 ===================
 
 
+Version 2024.07.28 (28/07/2024)
+
+- Fixes for The War Within
+- Added GetCharacterIDByGUID
+
 Version 2024.06.30 (30/06/2024)
 
 - Fixed the guild-character relationship sometimes getting broken. Relog an alt if it has "lost" its guild.

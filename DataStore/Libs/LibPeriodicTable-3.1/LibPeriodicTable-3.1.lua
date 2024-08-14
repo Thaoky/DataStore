@@ -1,6 +1,6 @@
 --[[
 Name: PeriodicTable-3.1
-Revision: $Rev: 603 $
+Revision: $Rev: 669 $
 Author: Nymbia (nymbia@gmail.com)
 Many thanks to Tekkub for writing PeriodicTable 1 and 2, and for permission to use the name PeriodicTable!
 Website: http://www.wowace.com/wiki/PeriodicTable-3.1
@@ -25,7 +25,18 @@ License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ]]
 
-local PT3, oldminor = LibStub:NewLibrary("LibPeriodicTable-3.1", tonumber(("$Revision: 603 $"):match("(%d+)")) + 90000)
+---@class LibPeriodicTable-3.1
+---@field ItemSearch function(item : number|string) : table
+---@field GetSetTable function(set : string) : table
+---@field GetSetString function(set : string) : string
+---@field IsSetMulti function(set : string) : boolean
+---@field IterateSet function(set : string) : function
+---@field AddData function(arg1 : string, arg2 : string|table, arg3 : table|nil)
+---@field ItemInSet function(item : number|string, set : string) : any, string
+---@field sets table
+---@field embedversions table
+
+local PT3, _oldminor = LibStub:NewLibrary("LibPeriodicTable-3.1", tonumber(("$Revision: 669 $"):match("(%d+)")) + 90000)
 if not PT3 then
 	return
 end
@@ -41,6 +52,13 @@ local assert = assert
 local table_concat = table.concat
 
 local iternum, iterpos, cache, sets, embedversions
+
+local ptGetNumAddOns = (C_AddOns and C_AddOns.GetNumAddOns) or GetNumAddOns
+local ptGetAddOnMetadata = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
+local ptGetAddOnInfo = (C_AddOns and C_AddOns.GetAddOnInfo) or GetAddOnInfo
+local ptLoadAddOn = (C_AddOns and C_AddOns.LoadAddOn) or LoadAddOn
+
+
 ---------------------------------------------
 --       Internal / Local Functions        --
 ---------------------------------------------
@@ -151,10 +169,10 @@ end
 do
 	-- Handle the initial scan of LoD data modules, storing in this local table so the sets metatable can find em
 	local lodmodules = {}
-	for i = 1, GetNumAddOns() do
-		local metadata = GetAddOnMetadata(i, "X-PeriodicTable-3.1-Module")
+	for i = 1, ptGetNumAddOns() do
+		local metadata = ptGetAddOnMetadata(i, "X-PeriodicTable-3.1-Module")
 		if metadata then
-			local name, _, _, enabled = GetAddOnInfo(i)
+			local name, _, _, enabled = ptGetAddOnInfo(i)
 			if enabled then
 				lodmodules[metadata] = name
 			end
@@ -165,7 +183,7 @@ do
 		__index = function(self, key)
 			local base = key:match("^([^%.]+)%.") or key
 			if lodmodules[base] then
-				LoadAddOn(lodmodules[base])
+				ptLoadAddOn(lodmodules[base])
 				lodmodules[base] = nil -- don't try to load again
 				-- still may need to generate multiset or something like that, so re-call the metamethod if need be
 				return self[key]
@@ -353,7 +371,7 @@ function PT3:ItemSearch(item)
 		self:error("Invalid arg1: invalid item.")
 	end
 	local matches = {}
-	for k,v in pairs(self.sets) do
+	for k, _v in pairs(self.sets) do
 		local _, set = self:ItemInSet(item, k)
 		if set then
 			local have

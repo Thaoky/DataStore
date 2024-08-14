@@ -331,10 +331,74 @@ local function GetModuleTable(module)
 	return module
 end
 
+
+local sharedTables = {
+	DataStore = { 
+		-- "DataStore_GuildIDs", 
+		-- "DataStore_GuildFactions", 
+		-- "DataStore_CharacterIDs", 
+		"DataStore_CharacterGUIDs", 
+		-- "DataStore_CharacterGuilds", 
+		-- "DataStore_AltGroups", "DataStore_ConnectedRealms", "DataStore_RealmNames"
+	},
+	DataStore_Achievements = { "DataStore_Achievements_Characters"	},
+	DataStore_Auctions = { "DataStore_Auctions_Characters", "DataStore_Auctions_AuctionsList", "DataStore_Auctions_BidsList" },
+	DataStore_Characters = { "DataStore_Characters_Info" },
+	DataStore_Containers = { 
+		"DataStore_Containers_Characters", "DataStore_Containers_Banks", "DataStore_Containers_Guilds", "DataStore_Containers_Reagents", 
+		"DataStore_Containers_VoidStorage", "DataStore_Containers_Keystones", "DataStore_Containers_BankTypes"
+	},
+	DataStore_Crafts = { "DataStore_Crafts_Characters", "DataStore_Crafts_ArcheologyItems", "DataStore_Crafts_RecipeCategories" },
+	DataStore_Currencies = { 
+		"DataStore_Currencies_Characters", "DataStore_Currencies_Catalog", "DataStore_Currencies_Info", "DataStore_Currencies_Max",
+		"DataStore_Currencies_Headers", "DataStore_Currencies_Archeology"
+	},
+	DataStore_Garrisons = { 
+		"DataStore_Garrisons_Characters", "DataStore_Garrisons_Missions", "DataStore_Garrisons_MissionInfos", 
+		"DataStore_Garrisons_Followers", "DataStore_Garrisons_FollowerNamesToID", "DataStore_Garrisons_Buildings", 
+		"DataStore_Garrisons_CovenantSanctum", "DataStore_Garrisons_CypherEquipment",	"DataStore_Garrisons_Shipments"
+	},
+	DataStore_Inventory = { "DataStore_Inventory_Characters" },
+	DataStore_Mails = { "DataStore_Mails_Characters" },
+	DataStore_Quests = { "DataStore_Quests_Characters"
+		--, "DataStore_Quests_History", "DataStore_Quests_Progress", "DataStore_Quests_Dailies", "DataStore_Quests_Weeklies", "DataStore_Quests_Colors", "DataStore_Quests_Infos"
+	},
+	DataStore_Reputations = { "DataStore_Reputations_Characters" },
+	DataStore_Spells = { "DataStore_Spells_Characters", "DataStore_Spells_Tabs" },
+	DataStore_Stats = { "DataStore_Stats_Characters"
+		--, "DataStore_Stats_Weekly", "DataStore_Stats_Dungeons"
+	},
+	DataStore_Talents = { 
+		"DataStore_Talents_Characters", "DataStore_Talents_Specializations", "DataStore_Talents_SpecializationInfos", 
+		"DataStore_Talents_Covenant", "DataStore_Talents_Conduits", "DataStore_Talents_ConduitSpecs", 
+		"DataStore_Talents_Soulbinds", "DataStore_Talents_Reasons"
+	},
+}
+
 function addon:GetCharacterTable(module, name, realm, account)
-	module = GetModuleTable(module)
+	-- Can the module be shared?
+	if not sharedTables[module] then return {} end
 	
-	return module.Characters[GetKey(name, realm, account)]
+	local charTable = {}
+	local key = GetKey(name, realm, account)
+	local charID = addon:GetCharacterID(key)
+	
+	--	 Iterate tables in the current module
+	local moduleTables = sharedTables[module]
+	
+	for moduleIndex, tableName in ipairs(moduleTables) do
+		-- do we have data for this character in the current table ?
+		if _G[tableName][charID] then
+		
+			-- we do, link it		
+			charTable[module] = charTable[module] or {}
+			charTable[module][moduleIndex] = _G[tableName][charID]
+		end
+	end
+	
+	return charTable
+	-- return module.Characters[GetKey(name, realm, account)]
+	
 end
 
 function addon:GetModuleLastUpdate(module, name, realm, account)

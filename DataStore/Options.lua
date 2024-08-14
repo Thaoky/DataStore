@@ -195,7 +195,7 @@ function addon:UpdateMemoryUsage(addons, parent, totalText)
 	-- memory used
 	list = ""
 	for index, module in ipairs(addons) do
-		if IsAddOnLoaded(module) then	-- module is enabled
+		if C_AddOns.IsAddOnLoaded(module) then	-- module is enabled
 			memInKb = GetAddOnMemoryUsage(module)
 			totalMem = totalMem + memInKb
 			

@@ -2,6 +2,10 @@ DataStore Changelog (dates in dd/mm/yyyy)
 ===================
 
 
+Version 2024.08.25 (25/08/2024)
+
+- Commented DeleteGuild.
+
 Version 2024.08.14 (14/08/2024)
 
 - ToC Update.

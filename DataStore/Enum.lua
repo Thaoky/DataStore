@@ -18,7 +18,9 @@ DataStore.Enum = {
 		BattlePets = 12,
 		
 		Minimum = 1,
-		Maximum = 12,
+		MinimumExpansion = 15,	-- use index 15 for expansion 0, 16 for 1, ..
+		Maximum = 15 + GetExpansionLevel(),
+		
 	},
 	BankTypesLabels = {
 		Cooking = C_Spell.GetSpellName(2550),
@@ -45,6 +47,17 @@ DataStore.Enum = {
 		[10] = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 4),
 		[11] = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 16),
 		[12] = AUCTION_CATEGORY_BATTLE_PETS,
+		[15] = EXPANSION_NAME0,
+		[16] = EXPANSION_NAME1,
+		[17] = EXPANSION_NAME2,
+		[18] = EXPANSION_NAME3,
+		[19] = EXPANSION_NAME4,
+		[20] = EXPANSION_NAME5,
+		[21] = EXPANSION_NAME6,
+		[22] = EXPANSION_NAME7,
+		[23] = EXPANSION_NAME8,
+		[24] = EXPANSION_NAME9,
+		[25] = EXPANSION_NAME10,
 	},
 }
 

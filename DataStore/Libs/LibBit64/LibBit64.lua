@@ -35,7 +35,7 @@ function lib:TestBit(value, pos)
 	local mask = 2 ^ pos
 	return value % (mask + mask) >= mask
 	
-	-- This one works too up to bit 63, but the first very is faster
+	-- This one works too up to bit 63, but the first version is faster
 	-- return (RightShift(value, pos) % 2) == 1
 end
 

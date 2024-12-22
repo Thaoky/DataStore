@@ -94,6 +94,6 @@ function namespace:Get(character)
 	return TableConcat(groups, ", "), groups
 end
 
-DataStore:OnPlayerLogin(function()
+AddonFactory:OnPlayerLogin(function()
 	altGroups = DataStore_AltGroups
 end)

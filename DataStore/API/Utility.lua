@@ -9,7 +9,7 @@ function addon:GetHashSize(hash)
 	for _, _ in pairs(hash) do
 		count = count + 1
 	end
-	
+
 	return count
 end
 
@@ -138,3 +138,4 @@ function addon:RemoveFromSetAndList(container, value)
 		container.Count = container.Count - 1
 	end
 end
+

@@ -1,5 +1,5 @@
 local addonName = ...
-local L = DataStore:SetDefaultLocale(addonName, "enUS")
+local L = AddonFactory:SetDefaultLocale(addonName, "enUS")
 
 L["Disabled"] = true
 L["Enabled"] = true

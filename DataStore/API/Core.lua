@@ -209,8 +209,8 @@ function addon:RegisterModule(options)
 	newModule.name = moduleName
 	newModule.ThisCharID = DataStore_CharacterIDs.Set and DataStore_CharacterIDs.Set[key]
 	newModule.Print = function(self, ...) Print(self.name, ...) end
-	newModule.ListenTo = function(self, ...) addon:ListenToEvent(self, ...) end
-	newModule.StopListeningTo = function(self, ...)	addon:StopListeningToEvent(self, ...) end
+	newModule.ListenTo = function(self, ...) AddonFactory:ListenToEvent(self, ...) end
+	newModule.StopListeningTo = function(self, ...)	AddonFactory:StopListeningToEvent(self, ...) end
 end
 
 function addon:RegisterTables(options)
@@ -452,3 +452,4 @@ function addon:ImportCharacter(key, faction, guild)
 		end
 	end)
 end
+

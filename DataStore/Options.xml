@@ -6,7 +6,7 @@
 		<Scripts>
 			<OnLoad>
 				local module = self:GetParent().module
-				local L = DataStore:GetLocale(module)
+				local L = AddonFactory:GetLocale(module)
 				
 				-- Set Label
 				self.Text:SetText(L[self.locLabel])

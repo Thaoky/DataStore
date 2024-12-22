@@ -34,6 +34,6 @@ function addon:GetRealmsConnectedWith(realm)
 	return out
 end
 
-DataStore:OnPlayerLogin(function()
+AddonFactory:OnPlayerLogin(function()
 	realmNames = DataStore_RealmNames
 end)

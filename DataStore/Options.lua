@@ -2,7 +2,7 @@ if not DataStore then return end
 
 local addonName = ...
 local addon = _G[addonName]
-local L = DataStore:GetLocale(addonName)
+local L = AddonFactory:GetLocale(addonName)
 
 local addonList = {
 	"DataStore",

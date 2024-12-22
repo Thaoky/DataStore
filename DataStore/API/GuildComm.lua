@@ -195,7 +195,7 @@ local function GuildCommHandler(prefix, message, distribution, sender)
 	end
 end
 
-DataStore:OnPlayerLogin(function()
+AddonFactory:OnPlayerLogin(function()
 	addon:ListenTo("PLAYER_ALIVE", OnPlayerGuildUpdate)
 	addon:ListenTo("PLAYER_GUILD_UPDATE", OnPlayerGuildUpdate)				-- for gkick, gquit, etc..
 

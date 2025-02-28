@@ -63,7 +63,7 @@ local function SaveAlts(sender, alts)
 		if strlen(alts) > 0 then	-- sender has no alts
 			onlineMembersAlts[sender] = alts				-- "alt1|alt2|alt3..."
 		end
-		DataStore:Broadcast("DATASTORE_GUILD_ALTS_RECEIVED", sender, alts)
+		AddonFactory:Broadcast("DATASTORE_GUILD_ALTS_RECEIVED", sender, alts)
 	end
 end
 
@@ -81,7 +81,7 @@ local function OnGuildRosterUpdate()
 			guildMembersIndexes[name] = i
 
 			if onlineMembers[name] and not onlineStatus then	-- if a player was online but has now gone offline, trigger a message
-				DataStore:Broadcast("DATASTORE_GUILD_MEMBER_OFFLINE", name)
+				AddonFactory:Broadcast("DATASTORE_GUILD_MEMBER_OFFLINE", name)
 			end
 			onlineMembers[name] = onlineStatus
 		end
@@ -132,7 +132,7 @@ local function OnPlayerGuildUpdate()
 		
 		-- the first time a valid value is found, broadcast to guild, it must happen here for a standard login, but won't work here after a reloadui since this event is not triggered
 		addon:GuildBroadcast(commPrefix, MSG_ANNOUNCELOGIN, GetAlts())
-		addon:Broadcast("DATASTORE_ANNOUNCELOGIN", currentGuildName)
+		AddonFactory:Broadcast("DATASTORE_ANNOUNCELOGIN", currentGuildName)
 	end
 	
 	local id = addon:StoreToSetAndList(DataStore_CharacterIDs, addon.ThisCharKey)
@@ -149,7 +149,7 @@ local function OnChatMsgSystem(event, arg)
 			-- marking him as offline prevents this
 			onlineMembers[member] = nil
 			onlineMembersAlts[member] = nil
-			DataStore:Broadcast("DATASTORE_GUILD_MEMBER_OFFLINE", member)
+			AddonFactory:Broadcast("DATASTORE_GUILD_MEMBER_OFFLINE", member)
 		end
 	end
 end
@@ -217,7 +217,7 @@ AddonFactory:OnPlayerLogin(function()
 	
 	if guild then
 		addon:GuildBroadcast(commPrefix, MSG_ANNOUNCELOGIN, GetAlts())
-		addon:Broadcast("DATASTORE_ANNOUNCELOGIN", guild)
+		AddonFactory:Broadcast("DATASTORE_ANNOUNCELOGIN", guild)
 	end
 end)
 

@@ -63,15 +63,11 @@ end
 --]]
 
 setmetatable(addon, { __index = function(self, key)
-	return function(self, arg1, ...)
+	-- if there is a registered method, handle it, return nil otherwise
+	-- Note: earlier implementation always returned the function (which we actually don't want)
+		
+	return registeredMethods[key]	and function(self, arg1, ...)
 		local method = registeredMethods[key]
-	
-		if not method then
-			-- enable this in Debug only, there's a risk that this function gets called unexpectedly
-			-- print(format("DataStore : method <%s> is missing.", key))
-			return
-		end
-
 		local owner = method.owner
 		
 		-- if this method is character related, the first expected parameter is the character

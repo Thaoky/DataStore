@@ -26,7 +26,9 @@ local modulesList = {
 if WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC then
 	-- Add cataclysm modules
 	modulesList["DataStore_Currencies"] = true
-
+elseif LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_MISTS_OF_PANDARIA then
+	-- Add mists of pandaria modules
+	modulesList["DataStore_Currencies"] = true												 
 elseif WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
 	-- retail, add the remaining modules
 	modulesList["DataStore_Currencies"] = true
@@ -149,7 +151,7 @@ local unboundCount = 0
 
 function addon:RegisterMethod(moduleObject, methodName, method)
 	if registeredMethods[methodName] then
-		print(format("DataStore:RegisterMethod() : adding method for module <%s> failed.", moduleName))
+		print(format("DataStore:RegisterMethod() : adding method for module <%s> failed.", moduleName or "unknown"))
 		print(format("DataStore:RegisterMethod() : method <%s> already exists !", methodName))
 		return
 	end

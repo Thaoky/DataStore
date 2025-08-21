@@ -4,6 +4,10 @@ local addonName = ...
 local addon = _G[addonName]
 local L = AddonFactory:GetLocale(addonName)
 
+local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
+
+local API_IsAddOnLoaded = isClassic and IsAddOnLoaded or C_AddOns.IsAddOnLoaded
+
 local addonList = {
 	"DataStore",
 	"DataStore_Achievements",
@@ -195,7 +199,7 @@ function addon:UpdateMemoryUsage(addons, parent, totalText)
 	-- memory used
 	list = ""
 	for index, module in ipairs(addons) do
-		if C_AddOns.IsAddOnLoaded(module) then	-- module is enabled
+		if API_IsAddOnLoaded(module) then	-- module is enabled
 			memInKb = GetAddOnMemoryUsage(module)
 			totalMem = totalMem + memInKb
 			

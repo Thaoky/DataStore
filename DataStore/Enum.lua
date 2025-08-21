@@ -2,6 +2,11 @@
 Global Enumerations, used by other DataStore modules or client add-ons.
 --]]
 
+local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
+
+local API_GetSpellName = isClassic and GetSpellInfo or C_Spell.GetSpellName
+local API_GetItemSubClassInfo = isClassic and GetItemSubClassInfo or C_Item.GetItemSubClassInfo
+
 DataStore.Enum = {
 	BankTypes = {
 		Cooking = 1,
@@ -23,29 +28,29 @@ DataStore.Enum = {
 		
 	},
 	BankTypesLabels = {
-		Cooking = C_Spell.GetSpellName(2550),
-		Fishing = C_Spell.GetSpellName(131474),
-		Herb = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 9),
-		Cloth = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 5),
-		Leather = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 6),
-		Metal = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 7),
-		Elemental = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 10),
-		Enchanting = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 12),
-		Engineering = C_Spell.GetSpellName(4036),
-		Jewelcrafting = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 4),
-		Inscription = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 16),
+		Cooking = API_GetSpellName(2550),
+		Fishing = API_GetSpellName(131474),
+		Herb = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 9),
+		Cloth = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 5),
+		Leather = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 6),
+		Metal = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 7),
+		Elemental = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 10),
+		Enchanting = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 12),
+		Engineering = API_GetSpellName(4036),
+		Jewelcrafting = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 4),
+		Inscription = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 16),
 		BattlePets = AUCTION_CATEGORY_BATTLE_PETS,
-		[1] = C_Spell.GetSpellName(2550),
-		[2] = C_Spell.GetSpellName(131474),
-		[3] = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 9),
-		[4] = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 5),
-		[5] = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 6),
-		[6] = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 7),
-		[7] = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 10),
-		[8] = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 12),
-		[9] = C_Spell.GetSpellName(4036),
-		[10] = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 4),
-		[11] = C_Item.GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 16),
+		[1] = API_GetSpellName(2550),
+		[2] = API_GetSpellName(131474),
+		[3] = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 9),
+		[4] = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 5),
+		[5] = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 6),
+		[6] = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 7),
+		[7] = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 10),
+		[8] = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 12),
+		[9] = API_GetSpellName(4036),
+		[10] = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 4),
+		[11] = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 16),
 		[12] = AUCTION_CATEGORY_BATTLE_PETS,
 		[15] = EXPANSION_NAME0,
 		[16] = EXPANSION_NAME1,

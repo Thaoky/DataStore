@@ -138,4 +138,3 @@ function addon:RemoveFromSetAndList(container, value)
 		container.Count = container.Count - 1
 	end
 end
-

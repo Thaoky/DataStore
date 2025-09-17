@@ -84,14 +84,25 @@ function namespace:Get(character)
 	local characterID = addon:GetCharacterID(character) or 0
 	local groups = {}
 	
-	for groupName, groupMembers in pairs(altGroups) do
-		if addon:ArrayContainsValue(altGroups[groupName], characterID) then
+	for groupName, group in pairs(altGroups) do
+		-- if addon:ArrayContainsValue(altGroups[groupName], characterID) then
+		if addon:ArrayContainsValue(group, characterID) then
 			TableInsert(groups, groupName)
 		end
 	end
 	
 	-- return the list of groups as a concatenated string, but also as a table
 	return TableConcat(groups, ", "), groups
+end
+
+function namespace:IsGrouped(character)
+	local characterID = addon:GetCharacterID(character) or 0
+	
+	for _, group in pairs(altGroups) do
+		if addon:ArrayContainsValue(group, characterID) then
+			return true
+		end
+	end
 end
 
 AddonFactory:OnPlayerLogin(function()

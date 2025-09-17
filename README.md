@@ -23,7 +23,7 @@ These libraries cannot and should not be embedded, as they all manage their resp
 * [DataStore_Agenda](https://github.com/Thaoky/DataStore_Agenda) : Calendar & Raid ID's
 * [DataStore_Auctions](https://github.com/Thaoky/DataStore_Auctions) : Auctions & Bids
 * [DataStore_Characters](https://github.com/Thaoky/DataStore_Characters) : Base information about your characters
-* [DataStore_Containers](https://github.com/Thaoky/DataStore_Agenda) : Bags, Bank and Guild Banks
+* [DataStore_Containers](https://github.com/Thaoky/DataStore_Containers) : Bags, Bank and Guild Banks
 * [DataStore_Crafts](https://github.com/Thaoky/DataStore_Crafts) : Tradeskills & Recipes
 * [DataStore_Currencies](https://github.com/Thaoky/DataStore_Currencies) : Currencies
 * [DataStore_Garrisons](https://github.com/Thaoky/DataStore_Garrisons) : Garrisons
@@ -34,7 +34,7 @@ These libraries cannot and should not be embedded, as they all manage their resp
 * [DataStore_Reputations](https://github.com/Thaoky/DataStore_Reputations) : Reputations
 * [DataStore_Spells](https://github.com/Thaoky/DataStore_Spells) : Spells
 * [DataStore_Stats](https://github.com/Thaoky/DataStore_Stats) : Character Statistics
-* [DataStore_Talents](https://github.com/Thaoky/DataStore_Agenda) : Talent trees & Glyphs
+* [DataStore_Talents](https://github.com/Thaoky/DataStore_Talents) : Talent trees & Glyphs
 
 Each module will exist as a separate add-on, so that authors can package only the ones they want with their own project.
 

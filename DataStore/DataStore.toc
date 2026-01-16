@@ -1,10 +1,10 @@
-## Interface: 110205, 50501, 11507
+## Interface: 110207, 50503, 20505, 11508
 ## Title: DataStore by |cFF69CCF0Thaoky|r
 ## IconTexture: Interface\Icons\garrison_building_storehouse
 
 ## Notes: Main DataStore Module
 ## Author: Thaoky (EU-Marécages de Zangar)
-## Version: 2025.10.19
+## Version: 2026.01.16
 ## Dependencies: AddonFactory
 ## SavedVariables: DataStore_GuildIDs, DataStore_GuildFactions, DataStore_CharacterIDs, DataStore_CharacterGUIDs, DataStore_CharacterGuilds, DataStore_AltGroups, DataStore_ConnectedRealms, DataStore_RealmNames
 ## X-Category: Interface Enhancements

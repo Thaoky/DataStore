@@ -15,6 +15,7 @@ local modulesList = {
 	["DataStore_Characters"] = true,
 	["DataStore_Containers"] = true,
 	["DataStore_Crafts"] = true,
+	["DataStore_Currencies"] = true,
 	["DataStore_Inventory"] = true,
 	["DataStore_Mails"] = true,
 	["DataStore_Quests"] = true,
@@ -23,15 +24,8 @@ local modulesList = {
 	["DataStore_Talents"] = true
 }
 
-if WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC then
-	-- Add cataclysm modules
-	modulesList["DataStore_Currencies"] = true
-elseif LE_EXPANSION_LEVEL_CURRENT == LE_EXPANSION_MISTS_OF_PANDARIA then
-	-- Add mists of pandaria modules
-	modulesList["DataStore_Currencies"] = true												 
-elseif WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
 	-- retail, add the remaining modules
-	modulesList["DataStore_Currencies"] = true
 	modulesList["DataStore_Garrisons"] = true
 	modulesList["DataStore_Pets"] = true
 	modulesList["DataStore_Stats"] = true
@@ -451,5 +445,6 @@ function addon:ImportCharacter(key, faction, guild)
 		end
 	end)
 end
+
 
 

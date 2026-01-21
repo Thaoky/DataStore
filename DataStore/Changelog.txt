@@ -2,6 +2,10 @@ DataStore Changelog (dates in dd/mm/yyyy)
 ===================
 
 
+Version 2026.01.21 (21/01/2026)
+
+- Updated ToC for 12.0.
+
 Version 2025.10.19 (19/10/2025)
 
 - Updated ToC for 11.2.5.

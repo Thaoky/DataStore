@@ -1,4 +1,4 @@
-## Interface: 110207, 50503, 20505, 11508
+## Interface: 120000, 50503, 20505, 11508
 ## Title: DataStore by |cFF69CCF0Thaoky|r
 ## IconTexture: Interface\Icons\garrison_building_storehouse
 
@@ -13,6 +13,18 @@
 ## X-eMail: thaoky.altoholic@yahoo.com
 ## X-Donate: https://www.curseforge.com/wow/addons/altoholic
 ## X-Credits: My guild (Odysseüs), all translators, the wowace community, and all users for their invaluable suggestions !
+
+## Category: Libraries
+## Category-deDE: Bibliotheken
+## Category-esES: Bibliotecas
+## Category-esMX: Bibliotecas
+## Category-frFR: Bibliothèques
+## Category-itIT: Librerie
+## Category-koKR: 라이브러리
+## Category-ptBR: Bibliotecas
+## Category-ruRU: Библиотеки
+## Category-zhCN: 函数库
+## Category-zhTW: 函式庫
 
 Embeds.xml
 

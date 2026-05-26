@@ -396,7 +396,7 @@ function addon:DeleteRealm(realm, account)
 end
 
 local function WipeCharacterTable(t)
-	if not t then return end
+	if type(t) ~= "table" then return end
 
 	for key, v in pairs(t) do	-- key is the character key
 		if key ~= addon.ThisCharKey then	-- only delete an entry if it is not the current character
@@ -406,7 +406,7 @@ local function WipeCharacterTable(t)
 end
 
 local function WipeGuildTable(t)
-	if not t then return end
+	if type(t) ~= "table" then return end
 
 	for key, v in pairs(t) do	-- key is the guild key
 		t[key] = nil

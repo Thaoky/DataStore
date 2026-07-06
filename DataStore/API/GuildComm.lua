@@ -141,7 +141,11 @@ end
 
 local msgOffline = gsub(ERR_FRIEND_OFFLINE_S, "%%s", "(.+)")		-- this turns "%s has gone offline." into "(.+) has gone offline."
 
+-- This probably needs to move to triggering on GUILD_ROSTER_UPDATE and use C_GuildInfo.GuildRoster()
 local function OnChatMsgSystem(event, arg)
+	-- This breaks the functionality for marking offline, but removes secret value error
+	if canaccessvalue and not canaccessvalue(arg) then return end
+
 	if arg then
 		local member = arg:match(msgOffline)
 		if member then

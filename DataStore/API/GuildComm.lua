@@ -29,14 +29,16 @@ local function GetKey(name, realm, account)
 	return format("%s.%s.%s", account, realm, name)
 end
 
-local function GetAlts()
+local function GetAlts(guildID)
+	-- guildID = the guild of the current character. Callers that have just resolved it pass it in,
+	-- the others ask for the one this character is registered under.
+	-- Do not rebuild a key from ThisRealm here: on connected realms the guild may be homed on another
+	-- realm of the group, and OnPlayerGuildUpdate() registered it under that one. Rebuilding it would
+	-- compare our alts against the wrong id, so none of them would ever match, and it would also
+	-- register a second id in DataStore_GuildIDs for a guild that already has one.
+	guildID = guildID or addon:GetCharacterGuildID(addon.ThisCharKey)
+	if not guildID then return end
 
-	local guild = GetGuildInfo("player")
-	if not guild then	return end
-	
-	local guildKey = GetKey(guild)
-	local guildID = addon:StoreToSetAndList(DataStore_GuildIDs, guildKey)
-	
 	local out = {}
 	for k, charID in pairs(DataStore_CharacterIDs.Set) do
 		local account, realm, char = strsplit(".", k)
@@ -131,7 +133,8 @@ local function OnPlayerGuildUpdate()
 		DataStore_GuildFactions[guildID] = addon.ThisFaction
 		
 		-- the first time a valid value is found, broadcast to guild, it must happen here for a standard login, but won't work here after a reloadui since this event is not triggered
-		addon:GuildBroadcast(commPrefix, MSG_ANNOUNCELOGIN, GetAlts())
+		-- pass the id we just resolved, it is only written to DataStore_CharacterGuilds below
+		addon:GuildBroadcast(commPrefix, MSG_ANNOUNCELOGIN, GetAlts(guildID))
 		AddonFactory:Broadcast("DATASTORE_ANNOUNCELOGIN", currentGuildName)
 	end
 	

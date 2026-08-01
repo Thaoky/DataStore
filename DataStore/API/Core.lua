@@ -325,30 +325,39 @@ local function GetModuleTable(module)
 end
 
 
+-- Tables that account sharing is allowed to transfer, per module.
+-- Only list tables that are indexed by character id (ie: registered as characterTables or characterIdTables).
+-- Guild tables are indexed by guild id, and reference tables by a currency id, a category id, a class name, etc..
+-- an entry of theirs at [charID] belongs to something else entirely, and sending it would overwrite
+-- unrelated data on the receiving side.
+-- The index of a table in this list is what identifies it in the transferred payload, so both ends must
+-- run the same version. Append new tables at the end of a module rather than inserting them.
 local sharedTables = {
-	DataStore = { 
-		-- "DataStore_GuildIDs", 
-		-- "DataStore_GuildFactions", 
-		-- "DataStore_CharacterIDs", 
-		"DataStore_CharacterGUIDs", 
-		-- "DataStore_CharacterGuilds", 
+	DataStore = {
+		-- "DataStore_GuildIDs",
+		-- "DataStore_GuildFactions",
+		-- "DataStore_CharacterIDs",
+		"DataStore_CharacterGUIDs",
+		-- "DataStore_CharacterGuilds",
 		-- "DataStore_AltGroups", "DataStore_ConnectedRealms", "DataStore_RealmNames"
 	},
 	DataStore_Achievements = { "DataStore_Achievements_Characters"	},
 	DataStore_Auctions = { "DataStore_Auctions_Characters", "DataStore_Auctions_AuctionsList", "DataStore_Auctions_BidsList" },
 	DataStore_Characters = { "DataStore_Characters_Info" },
-	DataStore_Containers = { 
-		"DataStore_Containers_Characters", "DataStore_Containers_Banks", "DataStore_Containers_Guilds", "DataStore_Containers_Reagents", 
+	DataStore_Containers = {
+		-- "DataStore_Containers_Guilds" is a guild table
+		"DataStore_Containers_Characters", "DataStore_Containers_Banks", "DataStore_Containers_Reagents",
 		"DataStore_Containers_VoidStorage", "DataStore_Containers_Keystones", "DataStore_Containers_BankTypes"
 	},
-	DataStore_Crafts = { "DataStore_Crafts_Characters", "DataStore_Crafts_ArcheologyItems", "DataStore_Crafts_RecipeCategories" },
-	DataStore_Currencies = { 
-		"DataStore_Currencies_Characters", "DataStore_Currencies_Catalog", "DataStore_Currencies_Info", "DataStore_Currencies_Max",
-		"DataStore_Currencies_Headers", "DataStore_Currencies_Archeology"
+	-- "DataStore_Crafts_RecipeCategories" is indexed by category id
+	DataStore_Crafts = { "DataStore_Crafts_Characters", "DataStore_Crafts_ArcheologyItems" },
+	DataStore_Currencies = {
+		-- "DataStore_Currencies_Catalog" & "_Headers" are Set/List references, "_Info" & "_Max" are indexed by currency id
+		"DataStore_Currencies_Characters", "DataStore_Currencies_Archeology"
 	},
-	DataStore_Garrisons = { 
-		"DataStore_Garrisons_Characters", "DataStore_Garrisons_Missions", "DataStore_Garrisons_MissionInfos", 
-		"DataStore_Garrisons_Followers", "DataStore_Garrisons_FollowerNamesToID", "DataStore_Garrisons_Buildings", 
+	DataStore_Garrisons = {
+		"DataStore_Garrisons_Characters", "DataStore_Garrisons_Missions", "DataStore_Garrisons_MissionInfos",
+		"DataStore_Garrisons_Followers", "DataStore_Garrisons_FollowerNamesToID", "DataStore_Garrisons_Buildings",
 		"DataStore_Garrisons_CovenantSanctum", "DataStore_Garrisons_CypherEquipment",	"DataStore_Garrisons_Shipments"
 	},
 	DataStore_Inventory = { "DataStore_Inventory_Characters" },
@@ -357,41 +366,43 @@ local sharedTables = {
 		--, "DataStore_Quests_History", "DataStore_Quests_Progress", "DataStore_Quests_Dailies", "DataStore_Quests_Weeklies", "DataStore_Quests_Colors", "DataStore_Quests_Infos"
 	},
 	DataStore_Reputations = { "DataStore_Reputations_Characters" },
-	DataStore_Spells = { "DataStore_Spells_Characters", "DataStore_Spells_Tabs" },
+	-- "DataStore_Spells_Tabs" is indexed by class name
+	DataStore_Spells = { "DataStore_Spells_Characters" },
 	DataStore_Stats = { "DataStore_Stats_Characters"
 		--, "DataStore_Stats_Weekly", "DataStore_Stats_Dungeons"
 	},
-	DataStore_Talents = { 
-		"DataStore_Talents_Characters", "DataStore_Talents_Specializations", "DataStore_Talents_SpecializationInfos", 
-		"DataStore_Talents_Covenant", "DataStore_Talents_Conduits", "DataStore_Talents_ConduitSpecs", 
+	DataStore_Talents = {
+		-- "DataStore_Talents_SpecializationInfos" is indexed by specialization id
+		"DataStore_Talents_Characters", "DataStore_Talents_Specializations",
+		"DataStore_Talents_Covenant", "DataStore_Talents_Conduits", "DataStore_Talents_ConduitSpecs",
 		"DataStore_Talents_Soulbinds", "DataStore_Talents_Reasons"
 	},
 }
 
 function addon:GetCharacterTable(module, name, realm, account)
 	-- Can the module be shared?
-	if not sharedTables[module] then return {} end
-	
+	local moduleTables = sharedTables[module]
+	if not moduleTables then return {} end
+
 	local charTable = {}
 	local key = GetKey(name, realm, account)
 	local charID = addon:GetCharacterID(key)
-	
+
 	--	 Iterate tables in the current module
-	local moduleTables = sharedTables[module]
-	
 	for moduleIndex, tableName in ipairs(moduleTables) do
+		-- the table may not exist at all, several of them are only created on retail
+		local sourceTable = _G[tableName]
+
 		-- do we have data for this character in the current table ?
-		if _G[tableName][charID] then
-		
-			-- we do, link it		
+		if sourceTable and sourceTable[charID] then
+
+			-- we do, link it
 			charTable[module] = charTable[module] or {}
-			charTable[module][moduleIndex] = _G[tableName][charID]
+			charTable[module][moduleIndex] = sourceTable[charID]
 		end
 	end
-	
+
 	return charTable
-	-- return module.Characters[GetKey(name, realm, account)]
-	
 end
 
 function addon:GetModuleLastUpdate(module, name, realm, account)
@@ -433,17 +444,22 @@ function addon:ImportData(module, data, name, realm, account)
 	local importedTables = data and data[module]
 	if not importedTables then return end
 
-	-- be sure an id exists for the imported character, both tables are indexed by it
+	-- be sure an id exists for the imported character, every module table is indexed by it
 	local charID = addon:StoreToSetAndList(DataStore_CharacterIDs, GetKey(name, realm, account))
 
-	for moduleIndex, importedTable in pairs(importedTables) do
+	for moduleIndex, importedData in pairs(importedTables) do
 		local tableName = moduleTables[moduleIndex]
 		local destination = tableName and _G[tableName]
 
 		if destination then
-			-- CopyTable is necessary rather than assignment, the source table belongs to the serializer.
-			destination[charID] = {}
-			addon:CopyTable(importedTable, destination[charID])
+			if type(importedData) == "table" then
+				-- CopyTable is necessary rather than assignment, the source table belongs to the serializer.
+				destination[charID] = {}
+				addon:CopyTable(importedData, destination[charID])
+			else
+				-- character id tables may hold a plain value (ex: a specialization id)
+				destination[charID] = importedData
+			end
 		end
 	end
 end

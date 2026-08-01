@@ -47,16 +47,22 @@ function addon:SortedArrayClone(array)
 	return clone
 end
 
-function addon:CopyTable(source, destination)
+local function CopyTableInto(source, destination)
 	for k, v in pairs(source) do
-	
+
 		if type(v) == "table" then
 			destination[k] = {}
-			CopyTable(v, destination[k])
+			CopyTableInto(v, destination[k])
 		else
 			destination[k] = v
 		end
 	end
+end
+
+function addon:CopyTable(source, destination)
+	-- note: do not call the global CopyTable() for nested tables, it returns a new table
+	-- instead of filling the destination, which silently dropped every sub-table.
+	CopyTableInto(source, destination)
 end
 
 function addon:ArrayInsertUnique(array, value)

@@ -395,12 +395,18 @@ function addon:GetCharacterTable(module, name, realm, account)
 end
 
 function addon:GetModuleLastUpdate(module, name, realm, account)
-	module = GetModuleTable(module)
+	-- Can the module be shared?
+	local moduleTables = sharedTables[module]
+	if not moduleTables then return end
 
-	local key = GetKey(name, realm, account)
-	if key then
-		return module.Characters[key].lastUpdate
-	end
+	-- the first table of a module is the one holding its character data
+	local characterTable = _G[moduleTables[1]]
+	if not characterTable then return end
+
+	local charID = addon:GetCharacterID(GetKey(name, realm, account))
+	if not charID then return end
+
+	return characterTable[charID] and characterTable[charID].lastUpdate
 end
 
 function addon:GetModuleLastUpdateByKey(moduleName, key)
@@ -419,31 +425,37 @@ function addon:GetModuleLastUpdateByKey(moduleName, key)
 end
 
 function addon:ImportData(module, data, name, realm, account)
-	module = GetModuleTable(module)
-	
-	-- CopyTable is necessary rather than assignment, without it, ace DB wildcards are not applied.
-	addon:CopyTable(data, module.Characters[GetKey(name, realm, account)])
+	-- Can the module be shared?
+	local moduleTables = sharedTables[module]
+	if not moduleTables then return end
+
+	-- data was packed by GetCharacterTable: data[module][moduleIndex] = the module table of that character
+	local importedTables = data and data[module]
+	if not importedTables then return end
+
+	-- be sure an id exists for the imported character, both tables are indexed by it
+	local charID = addon:StoreToSetAndList(DataStore_CharacterIDs, GetKey(name, realm, account))
+
+	for moduleIndex, importedTable in pairs(importedTables) do
+		local tableName = moduleTables[moduleIndex]
+		local destination = tableName and _G[tableName]
+
+		if destination then
+			-- CopyTable is necessary rather than assignment, the source table belongs to the serializer.
+			destination[charID] = {}
+			addon:CopyTable(importedTable, destination[charID])
+		end
+	end
 end
 
-function addon:ImportCharacter(key, faction, guild)
+function addon:ImportCharacter(key)
 	-- after data has been imported, add a player entry to the DB, so that it becomes "visible" to the outside world.
 	-- in other words, the correct sequence of operations should be something like:
 	--	DataStore:ImportData(DataStore_Talents)
 	--	DataStore:ImportData(DataStore_Spells)
-	--	DataStore:ImportCharacter(key, faction, guild)
+	--	DataStore:ImportCharacter(key)
 
-	local characters = addon.db.global.Characters
-	
-	characters[key].faction = faction
-	characters[key].guildName = guild
-
-	-- Ensure a key is created for every module, even those which were not imported. 
-	-- Required for proper UI support without extra validation of every method
-	addon:IterateDBModules(function(moduleDB) 
-		if moduleDB.Characters then
-			moduleDB.Characters[key].lastUpdate = time()
-		end
-	end)
+	return addon:StoreToSetAndList(DataStore_CharacterIDs, key)
 end
 
 

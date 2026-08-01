@@ -261,9 +261,21 @@ end
 -- *** Guild functions ***
 
 function addon:GetGuild(name, realm, account)
+	-- No name ? the caller wants the guild of the current character, so answer with the guild it is
+	-- actually registered in, instead of rebuilding a key from its own realm. On connected realms the
+	-- guild may live on another realm of the group, and OnPlayerGuildUpdate() registered it under that
+	-- realm. Rebuilding the key from ThisRealm then creates a second key for the same guild, with a
+	-- second id, and every module that stored its data under the registered one looks empty.
+	if not name then
+		local guildID = _GetCharacterGuildID(addon.ThisCharKey)
+		local guildKey = guildID and allGuilds.List[guildID]
+
+		if guildKey then return guildKey end
+	end
+
 	name = name or GetGuildInfo("player")
 	local key = GetKey(name, realm, account)
-	
+
 	if allGuilds.Set[key] then		-- if the key is known, return it to caller, it can be passed to other modules
 		return key
 	else	-- if the key is not known, try checking the connected realm info

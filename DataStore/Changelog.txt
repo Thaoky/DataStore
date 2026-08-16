@@ -2,6 +2,10 @@ DataStore Changelog (dates in dd/mm/yyyy)
 ===================
 
 
+Version 2026.08.16 (16/08/2026)
+
+- Updated ToC for 12.1.
+
 Version 2026.07.10 (10/07/2026)
 
 - GitHub workflow version update.

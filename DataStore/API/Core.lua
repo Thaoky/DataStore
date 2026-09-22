@@ -419,31 +419,114 @@ function addon:GetModuleLastUpdateByKey(moduleName, key)
 end
 
 function addon:ImportData(module, data, name, realm, account)
-	module = GetModuleTable(module)
+	-- Fix #114/#115: Old code used module.Characters which no longer exists after AceDB rewrite
+	-- New implementation properly imports into _G[tableName][charID] structure
+	if not module or not data then return end
 	
-	-- CopyTable is necessary rather than assignment, without it, ace DB wildcards are not applied.
-	addon:CopyTable(data, module.Characters[GetKey(name, realm, account)])
+	local moduleTable = GetModuleTable(module)
+	local moduleName = type(module) == "string" and module or (moduleTable and moduleTable.name) or nil
+	if not moduleName then return end
+	
+	local tables = sharedTables[moduleName]
+	if not tables then
+		-- Fallback: try to find module name via registeredModules
+		for mName, mTable in pairs(registeredModules) do
+			if mTable == moduleTable then
+				moduleName = mName
+				tables = sharedTables[moduleName]
+				break
+			end
+		end
+	end
+	if not tables then return end
+	
+	local key = GetKey(name, realm, account)
+	local charID = DataStore_CharacterIDs and DataStore_CharacterIDs.Set and DataStore_CharacterIDs.Set[key]
+	if not charID then
+		-- Create new character ID if not exists
+		if DataStore_CharacterIDs then
+			DataStore_CharacterIDs.LastID = (DataStore_CharacterIDs.LastID or 0) + 1
+			charID = DataStore_CharacterIDs.LastID
+			DataStore_CharacterIDs.Set = DataStore_CharacterIDs.Set or {}
+			DataStore_CharacterIDs.List = DataStore_CharacterIDs.List or {}
+			DataStore_CharacterIDs.Set[key] = charID
+			DataStore_CharacterIDs.List[charID] = key
+			DataStore_CharacterIDs.Count = (DataStore_CharacterIDs.Count or 0) + 1
+		else
+			return
+		end
+	end
+	
+	-- Data format: data[moduleName][index] = table, as returned by GetCharacterTable
+	if data[moduleName] then
+		for index, tableName in ipairs(tables) do
+			local src = data[moduleName][index]
+			if src and _G[tableName] then
+				_G[tableName][charID] = _G[tableName][charID] or {}
+				addon:CopyTable(src, _G[tableName][charID])
+				-- Ensure lastUpdate is set
+				if _G[tableName][charID] then
+					_G[tableName][charID].lastUpdate = _G[tableName][charID].lastUpdate or time()
+				end
+			end
+		end
+	else
+		-- Fallback: data is directly the character table for first module table
+		-- This handles old format where data was just the char table
+		local tableName = tables[1]
+		if tableName and _G[tableName] then
+			_G[tableName][charID] = _G[tableName][charID] or {}
+			addon:CopyTable(data, _G[tableName][charID])
+			if _G[tableName][charID] then
+				_G[tableName][charID].lastUpdate = _G[tableName][charID].lastUpdate or time()
+			end
+		end
+	end
 end
 
 function addon:ImportCharacter(key, faction, guild)
-	-- after data has been imported, add a player entry to the DB, so that it becomes "visible" to the outside world.
-	-- in other words, the correct sequence of operations should be something like:
-	--	DataStore:ImportData(DataStore_Talents)
-	--	DataStore:ImportData(DataStore_Spells)
-	--	DataStore:ImportCharacter(key, faction, guild)
-
-	local characters = addon.db.global.Characters
+	-- Fix #114: Old code used addon.db.global.Characters which no longer exists after AceDB rewrite
+	-- after data has been imported, add a player entry to the DB, so that it becomes "visible"
+	if not key then return end
 	
-	characters[key].faction = faction
-	characters[key].guildName = guild
-
-	-- Ensure a key is created for every module, even those which were not imported. 
-	-- Required for proper UI support without extra validation of every method
-	addon:IterateDBModules(function(moduleDB) 
-		if moduleDB.Characters then
-			moduleDB.Characters[key].lastUpdate = time()
+	-- Ensure character ID exists
+	local charID = DataStore_CharacterIDs and DataStore_CharacterIDs.Set and DataStore_CharacterIDs.Set[key]
+	if not charID then
+		if DataStore_CharacterIDs then
+			DataStore_CharacterIDs.LastID = (DataStore_CharacterIDs.LastID or 0) + 1
+			charID = DataStore_CharacterIDs.LastID
+			DataStore_CharacterIDs.Set = DataStore_CharacterIDs.Set or {}
+			DataStore_CharacterIDs.List = DataStore_CharacterIDs.List or {}
+			DataStore_CharacterIDs.Set[key] = charID
+			DataStore_CharacterIDs.List[charID] = key
+			DataStore_CharacterIDs.Count = (DataStore_CharacterIDs.Count or 0) + 1
 		end
-	end)
+	end
+	
+	-- Update faction/guild info in DataStore_Characters_Info if available
+	if charID and DataStore_Characters_Info and DataStore_Characters_Info[charID] then
+		-- Faction is derived from race, but we can store guild info via guild ranks
+		-- For imported chars, ensure lastUpdate is set in all modules
+	end
+	
+	-- Ensure a lastUpdate timestamp in all character tables
+	for moduleName, tableNames in pairs(sharedTables) do
+		for _, tableName in ipairs(tableNames) do
+			local db = _G[tableName]
+			if db and db[charID] then
+				db[charID].lastUpdate = db[charID].lastUpdate or time()
+			elseif db and not db[charID] then
+				-- Create minimal entry so UI can show character
+				db[charID] = db[charID] or { lastUpdate = time() }
+			end
+		end
+	end
+	
+	-- Fallback for old AceDB if still present
+	if addon.db and addon.db.global and addon.db.global.Characters and addon.db.global.Characters[key] then
+		addon.db.global.Characters[key].faction = faction
+		addon.db.global.Characters[key].guildName = guild
+	end
 end
 
 

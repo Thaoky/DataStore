@@ -3,6 +3,11 @@ local addonName, addon = ...
 local TableInsert, TableConcat, format, pairs = table.insert, table.concat, format, pairs
 local altGroups
 
+local MVC = LibStub("LibMVC-1.0")
+local oop = MVC:GetService("AddonFactory.Classes")
+local worker = oop:New("Dictionary")
+
+
 addon.AltGroups = {}
 local namespace = addon.AltGroups
 
@@ -105,6 +110,11 @@ function namespace:IsGrouped(character)
 	end
 end
 
+function namespace:GetNumGroups()
+	return worker:Count()
+end
+
 AddonFactory:OnPlayerLogin(function()
 	altGroups = DataStore_AltGroups
+	worker:AttachTo(altGroups)
 end)

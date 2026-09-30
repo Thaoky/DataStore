@@ -33,7 +33,7 @@ end
 
 local function GetKey(name, realm, account)
 	-- default values
-	name = name or UnitName("player")
+	name = name or AddonFactory:GetPlayerName()
 	realm = realm or addon.ThisRealm
 	account = account or addon.ThisAccount
 

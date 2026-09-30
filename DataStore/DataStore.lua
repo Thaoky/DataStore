@@ -21,7 +21,8 @@ addon.Version = format("v%s", GetAddOnMetadata(addonName, "Version"))
 
 addon.ThisAccount = "Default"
 addon.ThisRealm = GetRealmName()
-addon.ThisChar = UnitName("player")
+addon.ThisChar = AddonFactory:GetPlayerName()
+
 addon.ThisCharKey = format("%s.%s.%s", addon.ThisAccount, addon.ThisRealm, addon.ThisChar)
 addon.ThisFaction = UnitFactionGroup("player")
 -- Do not dereference GetGuildInfo("player") here, it is nil
@@ -112,7 +113,7 @@ end)
 
 local function GetKey(name, realm, account)
 	-- default values
-	name = name or UnitName("player")
+	name = name or AddonFactory:GetPlayerName()
 	realm = realm or addon.ThisRealm
 	account = account or addon.ThisAccount
 

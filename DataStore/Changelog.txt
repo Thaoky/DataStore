@@ -2,6 +2,11 @@ DataStore Changelog (dates in dd/mm/yyyy)
 ===================
 
 
+Version 2026.09.30 (30/09/2026)
+
+- Replaced all calls to UnitName("player") by AddonFactory:GetPlayerName() for WoW Forever.
+- Updated for Altoholic Forever v1.60.001
+
 Version 2026.08.16 (16/08/2026)
 
 - Updated ToC for 12.1.

@@ -14,7 +14,7 @@ local LibSerialize = LibStub:GetLibrary("LibSerialize")
 
 local DataStore = DataStore
 local TableInsert, TableConcat, format, strsplit, gsub, pairs = table.insert, table.concat, format, strsplit, gsub, pairs
-local GetGuildInfo, GetGuildRosterInfo, GetNumGuildMembers, UnitName, C_ChatInfo = GetGuildInfo, GetGuildRosterInfo, GetNumGuildMembers, UnitName, C_ChatInfo
+local GetGuildInfo, GetGuildRosterInfo, GetNumGuildMembers, C_ChatInfo = GetGuildInfo, GetGuildRosterInfo, GetNumGuildMembers, C_ChatInfo
 
 -- Message types
 local MSG_ANNOUNCELOGIN				= 1	-- broadcast at login
@@ -22,7 +22,7 @@ local MSG_LOGINREPLY					= 2	-- reply to MSG_ANNOUNCELOGIN
 
 local function GetKey(name, realm, account)
 	-- default values
-	name = name or UnitName("player")
+	name = name or AddonFactory:GetPlayerName()
 	realm = realm or addon.ThisRealm
 	account = account or addon.ThisAccount
 
@@ -176,7 +176,7 @@ local commCallbacks = {
 	[commPrefix] = {
 		[MSG_ANNOUNCELOGIN] = function(sender, alts)
 				onlineMembers[sender] = true									-- sender is obviously online
-				if sender ~= UnitName("player") then						-- don't send back to self
+				if sender ~= AddonFactory:GetPlayerName() then			-- don't send back to self
 					addon:GuildWhisper(commPrefix, sender, MSG_LOGINREPLY, GetAlts())		-- reply by sending my own alts ..
 				end
 				SaveAlts(sender, alts)											-- .. and save received data
@@ -263,7 +263,7 @@ end
 
 function addon:IsGuildMemberOnline(member)
 	-- if self, always return true, may happen if login broadcast hasn't come back yet
-	return member == UnitName("player") and true or onlineMembers[member]
+	return member == AddonFactory:GetPlayerName() and true or onlineMembers[member]
 end
 
 function addon:GetNameOfMain(player)

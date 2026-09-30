@@ -29,7 +29,7 @@ DataStore.Enum = {
 	},
 	BankTypesLabels = {
 		Cooking = API_GetSpellName(2550),
-		Fishing = API_GetSpellName(131474),
+		Fishing = API_GetSpellName(131474) or API_GetSpellName(7620),	-- 7620 in WoW Forever
 		Herb = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 9),
 		Cloth = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 5),
 		Leather = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 6),

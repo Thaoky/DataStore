@@ -104,8 +104,43 @@ AddonFactory:OnAddonLoaded(addonName, function()
 	addon.Frames = CreateFrame("Frame", "DataStoreFrames", UIParent)
 end)
 
+
+local function SanitizeCharacters()
+	-- It seems that sometimes UnitName("player") returns nil, which messes up DataStoreCharacters.
+	-- To address this issue, this function will make sure only valid keys remain in the database.
+
+	if not DataStore_Characters_Info then return end
+	
+	local keysToDelete = AddonFactory:GetTable()
+
+	-- Parse all known character keys
+	for characterKey, v in pairs(allCharacters.Set) do
+		local charInfo = DataStore_Characters_Info[v]
+		
+		-- If the key has no matching entry in DataStoreCharacters, or has one with no name, it's invalid, so mark it for deletion.
+		if not charInfo or not charInfo.name then
+		
+			-- Make sure we skip the current character.
+			if characterKey ~= addon.ThisCharKey then
+				addon:Print(format("Invalid character key detected : %s", characterKey))
+				keysToDelete[characterKey] = true
+			end
+		end
+	end
+	
+	-- Delete the invalid keys
+	for characterKey, _ in pairs(keysToDelete) do
+		addon:Print(format("Character key %s deleted !", characterKey))
+		allCharacters.Set[characterKey] = nil
+	end
+		
+	AddonFactory:ReleaseTable(keysToDelete)
+end
+
 AddonFactory:OnPlayerLogin(function()
 	addon:SetLongRealmName(addon.ThisRealm:gsub(" ", ""), addon.ThisRealm)
+	
+	SanitizeCharacters()
 end)
 
 

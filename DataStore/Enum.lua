@@ -2,7 +2,7 @@
 Global Enumerations, used by other DataStore modules or client add-ons.
 --]]
 
-local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
+local isClassic = AddonFactory.isClassic
 
 local API_GetSpellName = isClassic and GetSpellInfo or C_Spell.GetSpellName
 local API_GetItemSubClassInfo = isClassic and GetItemSubClassInfo or C_Item.GetItemSubClassInfo
@@ -41,7 +41,7 @@ DataStore.Enum = {
 		Inscription = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 16),
 		BattlePets = AUCTION_CATEGORY_BATTLE_PETS,
 		[1] = API_GetSpellName(2550),
-		[2] = API_GetSpellName(131474),
+		[2] = API_GetSpellName(131474) or API_GetSpellName(7620),	-- 7620 in WoW Forever
 		[3] = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 9),
 		[4] = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 5),
 		[5] = API_GetItemSubClassInfo(Enum.ItemClass.Tradegoods, 6),
@@ -68,13 +68,13 @@ DataStore.Enum = {
 
 local e = DataStore.Enum
 
-if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+if isClassic then
 	-- classic era
 	e.ExpansionPacks = {
 		EXPANSION_NAME0,	-- "Classic"
 	}
 	
-elseif WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC then
+elseif AddonFactory.isTBC then
 	-- bcc
 	e.ExpansionPacks = {
 		EXPANSION_NAME0,	-- "Classic"

@@ -24,12 +24,16 @@ local modulesList = {
 	["DataStore_Talents"] = true
 }
 
-if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+if AddonFactory.isRetail then
 	-- retail, add the remaining modules
 	modulesList["DataStore_Garrisons"] = true
 	modulesList["DataStore_Pets"] = true
+end
+
+if AddonFactory.isRetail or AddonFactory.isForever then
 	modulesList["DataStore_Stats"] = true
 end
+
 
 local function GetKey(name, realm, account)
 	-- default values

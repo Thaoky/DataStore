@@ -4,7 +4,7 @@ local addonName = ...
 local addon = _G[addonName]
 local L = AddonFactory:GetLocale(addonName)
 
-local isClassic = (WOW_PROJECT_ID == WOW_PROJECT_CLASSIC)
+local isClassic = AddonFactory.isClassic
 
 local API_IsAddOnLoaded = isClassic and IsAddOnLoaded or C_AddOns.IsAddOnLoaded
 

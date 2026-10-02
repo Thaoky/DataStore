@@ -2,6 +2,13 @@ DataStore Changelog (dates in dd/mm/yyyy)
 ===================
 
 
+Version 2026.10.02 (02/10/2026)
+
+- Moved build information to AddonFactory to centralize version detection.
+- Updated UI version detection to support WoW Forever.
+- Added SanitizeCharacters() to check the list of character keys, and automatically delete invalid ones.
+- Updated for Altoholic Forever v1.60.002.
+
 Version 2026.09.30 (30/09/2026)
 
 - Replaced all calls to UnitName("player") by AddonFactory:GetPlayerName() for WoW Forever.

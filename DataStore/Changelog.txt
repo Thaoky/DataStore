@@ -2,6 +2,10 @@ DataStore Changelog (dates in dd/mm/yyyy)
 ===================
 
 
+Version 2026.10.14 (14/10/2026)
+
+- Updated ToC for 12.1.5.
+
 Version 2026.10.07 (07/10/2026)
 
 - Fixed Classic Era ToC number, now 11509.

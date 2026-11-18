@@ -88,12 +88,36 @@ local function OnGuildRosterUpdate()
 	end
 end
 
+local guildLeftCheckPending
+
+local function ClearGuildIfLeft()
+	guildLeftCheckPending = nil
+	if IsInGuild() then return end
+
+	-- The character is not in a guild (gquit, gkick, or left while DataStore was not running): forget the guild
+	currentGuildName = nil
+
+	local id = DataStore_CharacterIDs.Set[addon.ThisCharKey]
+	if id then
+		DataStore_CharacterGuilds[id] = nil
+	end
+end
+
 local function OnPlayerGuildUpdate()
 	-- at login this event is called between OnEnable and PLAYER_ALIVE, where GetGuildInfo returns a wrong value
 	-- however, the value returned here is correct
 	
-	-- If a guild name is already known, or if the character is not in a guild, leave.
-	if currentGuildName or not IsInGuild() then return end
+	-- Not in a guild: check again a few seconds later, since IsInGuild may not be reliable yet at login, then clear the saved guild.
+	if not IsInGuild() then
+		if not guildLeftCheckPending then
+			guildLeftCheckPending = true
+			C_Timer.After(5, ClearGuildIfLeft)
+		end
+		return
+	end
+
+	-- If a guild name is already known, leave.
+	if currentGuildName then return end
 	
 	local realmName, _
 	currentGuildName, _, _, realmName = GetGuildInfo("player")		-- realmName will be nil if guild is on the same realm as the character
